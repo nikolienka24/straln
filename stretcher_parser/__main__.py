@@ -23,7 +23,6 @@ def parse_arguments() -> argparse.Namespace:
 
     # ----- POSITIONAL ARGUMENTS -----
     parser_arg.add_argument("aln_input_file", help="path to the .aln alignment file from EMBOSS stretcher (.aln format)")
-    parser_arg.add_argument("chromosome", help="target chromosome (1-22, X, Y)")
 
     # ----- OPTIONAL ARGUMENTS -----
     parser_arg.add_argument("-o", "--output_folder", type=str, default=None, help="path to output folder (default: current folder)")
@@ -34,6 +33,9 @@ def parse_arguments() -> argparse.Namespace:
         "-vcf", "--vcf_input_file",
         help="input VCF file, providing this triggers the search for alternative mutations"
     )
+    parser_arg.add_argument(
+        "-c", "--chromosome", 
+        help="target chromosome (1-22, X, Y)")
     mutation.add_argument(
         "-d", "--distance", type=int, default=100,
         help="window size (bp) for finding nearby alternative mutations (default: 100)"

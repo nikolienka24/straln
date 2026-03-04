@@ -25,9 +25,9 @@ pip install -e .
 # Getting Help
 straln --help
 # only parse the alignment
-straln my_alignment.aln 17 -o ./output_folder
-# parse alignment and find alternative mutations from a VCF
-straln my_alignment.aln 17 -vcf variations.vcf -d 150 -o ./output_folder
+straln my_alignment.aln -o ./output_folder
+# parse alignment and find alternative mutations from a VCF (when using -vcf parameter -c is mandatory)
+straln my_alignment.aln -vcf variations.vcf -c 17 -d 150 -o ./output_folder
 ```
 
 ### Output files
