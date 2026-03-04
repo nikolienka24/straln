@@ -9,23 +9,6 @@ from . import parser, reformat
 from .utils import save_statistics, get_offsets_from_file
 from analysis import find_alternative_mutations
 
-def parse_chromosome(ch: str) -> None:
-    ch = ch.upper()
-
-    if ch in ("X", "Y"):
-        return ch
-
-    try:
-        num = int(ch)
-        if 1 <= num <= 22:
-            return str(num)
-    except ValueError:
-        pass
-
-    raise argparse.ArgumentTypeError(
-        "Chromosome must be 1–22, X, Y"
-    )
-
 
 def parse_arguments() -> argparse.Namespace:
     parser_arg = argparse.ArgumentParser(
@@ -71,11 +54,12 @@ def main() -> None:
 
     # 0. parse input files =============================================================
     aln_input_file = args.aln_input_file
-    chromosome = args.chromosome
 
     vcf_input_file = None
+    chromosome = None
     if args.vcf_input_file:
         vcf_input_file = args.vcf_input_file
+        chromosome = args.chromosome
 
     output_folder = "."
     if args.output_folder:
