@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-stralign = "stretcher_parser.__main__:main"
+straln = "stretcher_parser.__main__:main"
 
 [tool.setuptools]
 packages = ["stretcher_parser", "analysis"]
