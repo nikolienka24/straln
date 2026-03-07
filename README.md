@@ -12,7 +12,7 @@ It transforms pairwise alignments into standardized genomic formats (BEDPE/BED) 
 ## Installation
 Install the latest stable version via `pip`:
 ```bash
-pip install pip install git+https://github.com/nikolienka24/straln
+pip install git+https://github.com/nikolienka24/straln
 
 # print help
 straln --help
