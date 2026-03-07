@@ -29,6 +29,7 @@ Convert **EMBOSS markx0** files into to standardized `BEDPE` and `BED` formats.
 #### Arguments
 | Parameter | Short | Description | Default |
 | :--- | :--- | :--- | :--- |
+| `alignment_file` | Path to the `input.aln` file. | **Required** |
 | `--output` | `-o` | Directory to save the parsed files. | `./stralln_parse_results` |
 | `--seq1_name` | `-s1` | Prefix for the output filenames. | `seq1` |
 | `--seq2_name` | `-s2` | Prefix for the output filenames. | `seq2` |
@@ -96,12 +97,34 @@ straln overlap parsed.bedpe -v variations.vcf -c 17 -d 150
 ----
 
 ### 3. Visual verification (`snap`)
+The `snap` module creates an IGV batch script based on a JSON configuration file. This allows you to generate high-resolution screenshots of all detected discrepancies automatically.
+
 #### Arguments
 | Parameter | Short | Description | Default |
 | :--- | :--- | :--- | :--- |
-| `--outdir` | `-o` | Directory to save IGV snapshots. | `./snapshots` |
+| `config` | | Path to the `setup.json` configuration file. | **Required** |
+
+#### **Example `setup.json`**
+```json
+{
+  "paths": {
+    "genome_fasta": "./HG002.fasta",
+    "regions_file": "./regions.bed",
+    "tracks": [
+      "HG002.corrected.bam",
+      "problematic.HG002.bed"
+    ],
+    "output_dir": "./outputs",
+    "script_file": "./igv_screenshot_script_HG002.txt"
+  },
+  "igv_settings": {
+    "window_padding": 50,
+    "max_panel_height": 2000
+  }
+}
+```
 
 #### Command
 ```bash
-straln snap setup.json -o ./snapshots
+straln snap setup.json
 ```
