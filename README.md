@@ -79,7 +79,7 @@ Compares mutations from your alignment against a VCF file within a user-defined 
 | :--- | :--- | :--- | :--- |
 | `--vcf` | `-v` | Path to the input VCF file. | **Yes** |
 | `--bedpe` | `-b` | Path to the input parsed BEDPE file. | **Yes** |
-| `--chrom` | `-c` | Target chromosome (e.g., `17`). | **Yes** |
+| `--chrom` | `-c` | Target chromosome identifier. This is implemented as **Regex search**, so for diploid genomes, include specific suffixes (e.g., `17_maternal` or `chr1_pat`). | **Yes** |
 | `--distance` | `-d` | Search distance (bp) around alignment gaps. | **No**, default: `100` |
 | `--output_folder` | `-o` | Search distance (bp) around alignment gaps. | **No**, default: `./stralln_alternative_mutations` |
 
