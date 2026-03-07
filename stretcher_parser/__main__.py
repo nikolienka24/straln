@@ -1,12 +1,13 @@
 import sys
 import os
 import argparse
+import json
 
 import pandas as pd
 
 from . import parser, reformat
 from .utils import save_statistics, get_offsets_from_file
-from analysis import find_alternative_mutations
+from analysis import find_alternative_mutations, create_igv_batch
 
 
 def handle_parse(args):
@@ -58,10 +59,38 @@ def handle_overlap(args):
 
 
 def handle_snap(args):
-    """Logic for the 'snap' command (Placeholder for your IGV logic)"""
-    print(f"[*] Snapping screenshots using {args.config}...")
-    # Your IGV snapping logic here
-    pass
+    """Logic for the 'snap' command: Generates IGV batch script from JSON"""
+    print(f"[*] Reading configuration from {args.config}...")
+    
+        # Use the first argument as the JSON config path
+    config_file = args.config
+
+    # Load configuration from JSON
+    with open(config_file, 'r') as f:
+        config = json.load(f)
+
+    # Extracting data from the new JSON structure
+    # We use .get() to provide safe defaults
+    paths = config.get('paths', {})
+    settings = config.get('igv_settings', {})
+
+    # Generate batch script
+    batch_script = create_igv_batch.create_igv_batch_script(
+        regions_file=paths.get('regions_file'),
+        output_dir=paths.get('output_dir'),
+        genome_fasta=paths.get('genome_fasta'),
+        tracks=paths.get('tracks', []), # This can now be a list of multiple files
+        window_padding=settings.get('window_padding', 50),
+        max_panel_height=settings.get('max_panel_height', 2000)
+    )
+
+    # Write batch script
+    batch_file = paths.get('script_file', 'igv_batch_script.bat')
+    with open(batch_file, 'w') as f:
+        f.write(batch_script)
+
+    print(f"[✔] IGV batch script created: {batch_file}")
+    print(f"[*] How to run: check the documentation")
 
 
 def main():
@@ -93,7 +122,6 @@ def main():
     # ----- COMMAND: snap -----
     p_snap = subparsers.add_parser("snap", help="Generate IGV snapshots")
     p_snap.add_argument("config", help="Path to setup.json")
-    p_snap.add_argument("-o", "--outdir", default="./snapshots", help="Output directory")
     p_snap.set_defaults(func=handle_snap)
 
     args = parser_main.parse_args()

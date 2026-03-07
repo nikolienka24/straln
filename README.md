@@ -104,7 +104,7 @@ The `snap` module creates an IGV batch script based on a JSON configuration file
 | :--- | :--- | :--- | :--- |
 | `config` | | Path to the `setup.json` configuration file. | **Required** |
 
-#### **Example `setup.json`**
+#### **Template for `setup.json`**
 ```json
 {
   "paths": {
@@ -115,7 +115,7 @@ The `snap` module creates an IGV batch script based on a JSON configuration file
       "problematic.HG002.bed"
     ],
     "output_dir": "./outputs",
-    "script_file": "./igv_screenshot_script_HG002.txt"
+    "script_file": "./script.txt"
   },
   "igv_settings": {
     "window_padding": 50,
@@ -128,3 +128,30 @@ The `snap` module creates an IGV batch script based on a JSON configuration file
 ```bash
 straln snap setup.json
 ```
+
+#### Output
+| File Type | Path |
+| :--- | :--- |
+| **Batch Script** | `./script.txt` |
+
+#### How to run the IGV batch script
+
+Once you have generated the script file using the `stralln snap` command, you can execute it to generate your snapshots using one of the two methods below.
+
+#### **Method 1: Using the IGV Desktop App (Graphical Interface)**
+1.  **Open IGV:** Launch the IGV Desktop application on your computer.
+2.  **Load the Script:** In the top menu bar, navigate to **Tools** > **Run Batch Script...**
+3.  **Select File:** Browse to your generated `.txt` file and click **Open**.
+4.  **Execution:** IGV will automatically begin loading tracks, navigating to the coordinates, and saving snapshots to your specified output directory.
+
+#### **Method 2: Using the Command Line (Non-Graphical Interface)**
+This method is ideal for automation or if you prefer working within the terminal.
+
+**On Linux or macOS:**
+Open your terminal and run the `igv.sh` script provided in the IGV installation folder:
+```bash
+# General syntax
+./igv.sh -b <path_to_your_script.txt>
+
+# Example
+./igv.sh -b ./scripts/igv_screenshot_script_PAN011.txt
