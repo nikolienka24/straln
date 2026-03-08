@@ -29,10 +29,10 @@ Convert **EMBOSS markx0** files into to standardized `BEDPE` and `BED` formats.
 | :--- | :--- | :--- | :--- |
 | `alignment_file` | Path to the `input.aln` file. | **Required** |
 | `--output` | `-o` | Directory to save the parsed files. | `./straln_parse_results` |
-| `--seq1_name` | `-s1` | Prefix for the output filenames. | `seq1` |
-| `--seq2_name` | `-s2` | Prefix for the output filenames. | `seq2` |
-| `--offset1` | `-off1` | Prefix for the output filenames. | extracted from the input alignment file header |
-| `--offset2` | `-off2` | Prefix for the output filenames. | extracted from the input alignment file header |
+| `--seq1_name` | `-s1` | Label for seq1. | `seq1` |
+| `--seq2_name` | `-s2` | Label for seq2. | `seq2` |
+| `--offset1` | `-off1` | Manual offset for seq1. | Extracted from the input alignment file header. |
+| `--offset2` | `-off2` | Manual offset for seq2. | Extracted from the input alignment file header. |
 
 #### Command 
 ```bash
@@ -41,17 +41,16 @@ straln parse my_alignment.aln -o ./results
 #### Output files
 | File | Format | Description |
 | :--- | :--- | :--- |
-| **`parsed.bedpe`** | `BEDPE` | **Raw Alignment Blocks.** Captures every exact match segment. |
-| **`parsed.joined.bedpe`** | `BEDPE` | **Merged Blocks.** Collapses fragmented segments for easier visualization of long Indels. |
-| **`seq1.bed` / `seq2.bed`** | `BED` | **Independent Tracks.** Standard BED files representing each individual sequence. |
+| **`parsed.bedpe`** | `BEDPE` | **Raw Alignment Blocks.** Captures every discrepancy. |
+| **`parsed.joined.bedpe`** | `BEDPE` | **Merged Blocks.** Collapses fragmented segments for easier visualization of long indels (example below). |
+| **`seq1.bed` / `seq2.bed`** | `BED` | **Independent Tracks.** Standard BED files representing discrepancies in each individual sequence from the alignment. |
 | **`stats.txt`** | `Text` | **Metrics.** Summary of alignment length, identity percentage, mismatches, and gaps. |
 
 ### Example: Automatic Merging (`.joined` files)
 
-The `straln` toolkit automatically identifies fragmented alignment blocks collapses them into unified genomic intervals. This occurs when two consecutive rows in the `.bedpe` file represent a continuous biological sequence.
+The `straln` toolkit automatically identifies fragmented alignment blocks collapses them into unified genomic intervals. This occurs when two consecutive rows in the `parsed.bedpe` file represent a continuous biological sequence.
 
 #### **Raw Fragments (`parsed.bedpe`)**
-Standard aligners often break a single match into multiple pieces due to tiny mismatches or gaps:
 | chrom1 | start1 | end1 | chrom2 | start2 | end2 | nucleotide1 | nucleotide2 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | seq1 | 8 | 9 | seq2 | 10 | 11 | **A** | **T** |
@@ -64,27 +63,32 @@ Standard aligners often break a single match into multiple pieces due to tiny mi
 | seq1 | start1 | end1 | chrom2 | start2 | end2 | sequence1 | sequence2 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | seq1 | 8 | 8 | seq2 | 10 | 10 | **A** | **T** |
-| **seq1** | **23** | **23** | **seq2** | **26** | **29** | **T** | **TTCC** |
+| **seq1** | **23** | **24** | **seq2** | **26** | **29** | **T** | **TTCC** |
 
 > **Note:** This merging is essential for the `overlap` module, as it defines the true boundaries of structural variants.
 
 ---
 
 ### 2. Find alternative mutations (`overlap`)
-Compares mutations from your alignment against a VCF file within a user-defined distance to report all matches.
+Compares mutations from your alignment/parsed alignment in `BEDPE` against a VCF file within a user-defined distance to report all variant matches.
 
 #### Parameters
 | Parameter | Short | Description | Required |
-| :--- | :--- | :--- | :--- |
+| :------- | :--- | :--- | :--- |
 | `--vcf` | `-v` | Path to the input VCF file. | **Yes** |
-| `--bedpe` | `-b` | Path to the input parsed BEDPE file. | **Yes** |
+| `--bedpe` | `-b` | Path to the input parsed BEDPE file. | **Yes** or `--aln` |
+| `--aln` | `-a` | Path to the input alignment file. | **Yes** or `--bedpe` |
 | `--chrom` | `-c` | Target chromosome identifier. This is implemented as **Regex search**, so for diploid genomes, include specific suffixes (e.g., `17_maternal` or `chr1_pat`). | **Yes** |
 | `--distance` | `-d` | Search distance (bp) around alignment gaps. | **No**, default: `100` |
 | `--output_folder` | `-o` | Search distance (bp) around alignment gaps. | **No**, default: `./straln_alternative_mutations` |
 
 #### Command
 ```bash
-straln overlap parsed.bedpe -v variations.vcf -c 17 -d 150
+# parsed alignment
+straln overlap --bedpe parsed.bedpe -v variations.vcf -c 17 -d 150
+
+# raw alignment
+straln overlap --aln input.aln -v variations.vcf -c 17 -d 150
 ```
 
 #### Output files
@@ -95,7 +99,7 @@ straln overlap parsed.bedpe -v variations.vcf -c 17 -d 150
 ----
 
 ### 3. Visual verification (`snap`)
-The `snap` module creates an IGV batch script based on a JSON configuration file. This allows you to generate high-resolution screenshots of all detected discrepancies automatically.
+The `snap` module creates an IGV batch script based on a JSON configuration file. This allows you to generate high-resolution screenshots of all provided discrepancies automatically.
 
 #### Arguments
 | Parameter | Short | Description | Default |
@@ -137,9 +141,9 @@ straln snap setup.json
 Once you have generated the script file using the `straln snap` command, you can execute it to generate your snapshots using one of the two methods below.
 
 #### **Method 1: Using the IGV Desktop App (Graphical Interface)**
-1.  **Open IGV:** Launch the IGV Desktop application on your computer.
+1.  Open the IGV Desktop application on your computer.
 2.  **Load the Script:** In the top menu bar, navigate to **Tools** > **Run Batch Script...**
-3.  **Select File:** Browse to your generated `.txt` file and click **Open**.
+3.  **Select Script File:** Browse to your generated `.txt` file and click **Open**.
 4.  **Execution:** IGV will automatically begin loading tracks, navigating to the coordinates, and saving snapshots to your specified output directory.
 
 #### **Method 2: Using the Command Line (Non-Graphical Interface)**
