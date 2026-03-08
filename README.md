@@ -53,10 +53,10 @@ The `straln` toolkit automatically identifies fragmented alignment blocks collap
 #### **Raw Fragments (`parsed.bedpe`)**
 | chrom1 | start1 | end1 | chrom2 | start2 | end2 | nucleotide1 | nucleotide2 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| seq1 | 8 | 9 | seq2 | 10 | 11 | **A** | **T** |
-| seq1 | 23 | 24 | seq2 | 26 | 27 | **T** | **T** |
-| seq1 | 23 | 24 | seq2 | 27 | 28 | **T** | **C** |
-| seq1 | 23 | 24 | seq2 | 28 | 29 | **T** | **C** |
+| seq1 | 8 | 8 | seq2 | 10 | 10 | **A** | **T** |
+| seq1 | 23 | 23 | seq2 | 26 | 26 | **T** | **T** |
+| seq1 | 23 | 23 | seq2 | 27 | 27 | **T** | **C** |
+| seq1 | 23 | 23 | seq2 | 28 | 28 | **T** | **C** |
 
 #### **Merged Result (`parsed.joined.bedpe`)**
 `straln` recognizes these belong to a single continuous alignment event:
