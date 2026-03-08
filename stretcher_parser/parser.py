@@ -50,8 +50,8 @@ def _check_sequences(sequence_name1: str, sequence_name2: str,
                 out2 = b
 
             buffer.append(
-                f"{sequence_name1}\t{pos1_start}\t{pos1_end}\t"
-                f"{sequence_name2}\t{pos2_start}\t{pos2_end}\t"
+                f"{sequence_name1}\t{pos1_start}\t{pos1_end + 1}\t"
+                f"{sequence_name2}\t{pos2_start}\t{pos2_end + 1}\t"
                 f"{out1}\t{out2}\n"
             )
 

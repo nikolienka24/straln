@@ -51,7 +51,7 @@ def _flush_buffer(buf: List[List[str]], out_fh: TextIO) -> None:
         elif len(line[6]) == 1 and len(line[7]) == 2:
             seq2 += line[7][1]
 
-    end1, end2 = buf[-1][2], buf[-1][5]
+    end1, end2 = buf[-1][2] + 1, buf[-1][5] + 1
 
     out_fh.write(f"{chrom1}\t{start1}\t{end1}\t{chrom2}\t{start2}\t{end2}\t{seq1}\t{seq2}\n")
 
@@ -102,7 +102,7 @@ def join_consecutive_rows(input_file: str, output_file: str) -> None:
 
             # BEDPE row: chrom1, start1, end1, chrom2, start2, end2, nt1, nt2
             chrom1, start1, end1, chrom2, start2, end2, nt1, nt2 = row
-            row_arr = [chrom1, start1, end1, chrom2, start2, end2, nt1, nt2]
+            row_arr = [chrom1, int(start1), int(end1) - 1, chrom2, int(start2), int(end2) - 1, nt1, nt2]
 
             if not buffer:
                 buffer.append(row_arr)
