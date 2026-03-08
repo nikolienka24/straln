@@ -12,7 +12,7 @@ from analysis import find_alternative_mutations, create_igv_batch
 
 def handle_parse(args):
     """Logic for the 'parse' command"""
-    output_folder = args.output_folder or "./straln_parse_results"
+    output_folder = args.output_folder or "./stralln_parse_results"
     os.makedirs(output_folder, exist_ok=True)
 
     # Handle offsets
@@ -49,12 +49,34 @@ def handle_parse(args):
 
 def handle_overlap(args):
     """Logic for the 'overlap' command"""
-    output_folder = args.output_folder or "./straln_alternative_mutations"
+    output_folder = args.output_folder
     os.makedirs(output_folder, exist_ok=True)
-    
+
+    bedpe = None
+    if args.aln:
+        print(f"[*] Argument -a (--aln) detected. Running parser first...")
+
+        # temporary bedpe files
+        parsed_file = os.path.join(output_folder, "tmp_parsed.bedpe")
+        parsed_joined_file = os.path.join(output_folder, "tmp_parsed.joined.bedpe")
+        
+        offset1, offset2 = get_offsets_from_file(args.aln)
+        parser.run(args.aln, parsed_file, "seq1", "seq2", offset1, offset2)
+        reformat.join_consecutive_rows(parsed_file, parsed_joined_file)
+        
+        bedpe = parsed_joined_file
+
+    elif args.bedbe:
+        bedpe = args.bedpe
+
+    print(f"[*] Running overlap analysis with: {bedpe}")
     find_alternative_mutations.find(
-        args.vcf, args.bedpe, output_folder, args.chrom, args.distance
+        args.vcf, bedpe, output_folder, args.chrom, args.distance
     )
+
+    if args.aln:
+        os.remove(parsed_file)
+    
     print(f"[✔] Overlap analysis complete. Results in: {output_folder}")
 
 
@@ -95,7 +117,7 @@ def handle_snap(args):
 
 def main():
     parser_main = argparse.ArgumentParser(
-        description="straln: Stretcher Alignment Toolkit",
+        description="stralln: Stretcher Alignment Toolkit",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     subparsers = parser_main.add_subparsers(dest="command", help="Available commands")
@@ -103,7 +125,7 @@ def main():
     # ----- COMMAND: parse -----
     p_parse = subparsers.add_parser("parse", help="Convert .aln to BEDPE/BED and merge consecutive rows.")
     p_parse.add_argument("aln_input_file", help="Path to EMBOSS .aln file")
-    p_parse.add_argument("-o", "--output_folder", default="./straln_results", help="Output directory")
+    p_parse.add_argument("-o", "--output_folder", default="./stralln_results", help="Output directory")
     p_parse.add_argument("-s1", "--seq_name1", default="seq1", help="Label for seq1")
     p_parse.add_argument("-s2", "--seq_name2", default="seq2", help="Label for seq2")
     p_parse.add_argument("-off1", "--offset1", type=int, help="Manual offset for seq1")
@@ -112,11 +134,15 @@ def main():
 
     # ----- COMMAND: overlap -----
     p_overlap = subparsers.add_parser("overlap", help="Find alternative mutations from VCF file.")
+    
+    input_group = p_overlap.add_mutually_exclusive_group(required=True)
+    input_group.add_argument("-b", "--bedpe", help="Input parsed BEDPE file")
+    input_group.add_argument("-a", "--aln", help="Input alignment file")
+
     p_overlap.add_argument("-v", "--vcf", required=True, help="Input VCF file")
-    p_overlap.add_argument("-b", "--bedpe", required=True, help="Input parsed BEDPE file")
     p_overlap.add_argument("-c", "--chrom", required=True, help="Chromosome")
     p_overlap.add_argument("-d", "--distance", type=int, default=100, help="Window size (bp)")
-    p_overlap.add_argument("-o", "--output_folder", default=".", help="Output directory")
+    p_overlap.add_argument("-o", "--output_folder", default="straln_overlap_result", help="Output directory")
     p_overlap.set_defaults(func=handle_overlap)
 
     # ----- COMMAND: snap -----

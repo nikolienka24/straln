@@ -82,7 +82,7 @@ Compares mutations from your alignment/parsed alignment in `BEDPE` against a VCF
 | `--aln` | `-a` | Path to the input alignment file. | **Yes** or `--bedpe` |
 | `--chrom` | `-c` | Target chromosome identifier. This is implemented as **Regex search**, so for diploid genomes, include specific suffixes (e.g., `17_maternal` or `chr1_pat`). | **Yes** |
 | `--distance` | `-d` | Search distance (bp) around alignment gaps. | **No**, default: `100` |
-| `--output_folder` | `-o` | Search distance (bp) around alignment gaps. | **No**, default: `./straln_alternative_mutations` |
+| `--output_folder` | `-o` | Search distance (bp) around alignment gaps. | **No**, default: `./straln_overlap_result` |
 
 #### Command
 ```bash
