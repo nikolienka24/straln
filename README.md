@@ -56,16 +56,16 @@ The `straln` toolkit automatically identifies fragmented alignment blocks collap
 | chrom1 | start1 | end1 | chrom2 | start2 | end2 | nucleotide1 | nucleotide2 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | seq1 | 8 | 9 | seq2 | 10 | 11 | **A** | **T** |
-| seq1 | 23 | 24 | seq2 | 26 | 27 | **T** | **T** |
-| seq1 | 23 | 24 | seq2 | 27 | 28 | **T** | **C** |
+| seq1 | 23 | 24 | seq2 | 26 | 28 | **T** | **TT** |
 | seq1 | 23 | 24 | seq2 | 28 | 29 | **T** | **C** |
+| seq1 | 23 | 24 | seq2 | 29 | 30 | **T** | **C** |
 
 #### **Merged Result (`parsed.joined.bedpe`)**
 `straln` recognizes these belong to a single continuous alignment event:
 | seq1 | start1 | end1 | chrom2 | start2 | end2 | sequence1 | sequence2 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | seq1 | 8 | 9 | seq2 | 10 | 11 | **A** | **T** |
-| **seq1** | **23** | **24** | **seq2** | **26** | **29** | **T** | **TTCC** |
+| **seq1** | **23** | **24** | **seq2** | **26** | **30** | **T** | **TTCC** |
 
 > **Note:** This merging is essential for the `overlap` module, as it defines the true boundaries of structural variants.
 
