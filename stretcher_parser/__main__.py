@@ -66,7 +66,7 @@ def handle_overlap(args):
         
         bedpe = parsed_joined_file
 
-    elif args.bedbe:
+    elif args.bedpe:
         bedpe = args.bedpe
 
     print(f"[*] Running overlap analysis with: {bedpe}")
