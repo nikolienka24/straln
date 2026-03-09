@@ -107,7 +107,7 @@ def find(vcf_input: str, parsed_bedpe: str, output_folder: str,
             match_mask = candidates.apply(
                 lambda row: is_99_percent_match(
                     vcf_ref, vcf_alt,
-                    row['sequence1'], row['sequence2']
+                    row['seq1'], row['seq2']
                 ), axis=1
             )
 

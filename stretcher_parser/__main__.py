@@ -169,7 +169,7 @@ def main():
     # ----- COMMAND: swap -----
     p_swap = subparsers.add_parser("swap", help="Swap alignment files.")
     p_swap.add_argument("input_file", help="Path to input BEDPE")
-    p_swap.add_argument("-o", "--output_file", default="./seapped.bedpe", help="Path to output file")
+    p_swap.add_argument("-o", "--output_file", default="./swapped.bedpe", help="Path to output file")
     p_swap.set_defaults(func=handle_swap)
 
     args = parser_main.parse_args()
