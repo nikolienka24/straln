@@ -12,7 +12,7 @@ from analysis import find_alternative_mutations, create_igv_batch
 
 def handle_parse(args):
     """Logic for the 'parse' command"""
-    output_folder = args.output_folder or "./stralln_parse_results"
+    output_folder = args.output_folder or "./straln_parse_results"
     os.makedirs(output_folder, exist_ok=True)
 
     # Handle offsets
@@ -117,7 +117,7 @@ def handle_snap(args):
 
 def main():
     parser_main = argparse.ArgumentParser(
-        description="stralln: Stretcher Alignment Toolkit",
+        description="straln: Stretcher Alignment Toolkit",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     subparsers = parser_main.add_subparsers(dest="command", help="Available commands")
@@ -125,7 +125,7 @@ def main():
     # ----- COMMAND: parse -----
     p_parse = subparsers.add_parser("parse", help="Convert .aln to BEDPE/BED and merge consecutive rows.")
     p_parse.add_argument("aln_input_file", help="Path to EMBOSS .aln file")
-    p_parse.add_argument("-o", "--output_folder", default="./stralln_results", help="Output directory")
+    p_parse.add_argument("-o", "--output_folder", default="./straln_results", help="Output directory")
     p_parse.add_argument("-s1", "--seq_name1", default="seq1", help="Label for seq1")
     p_parse.add_argument("-s2", "--seq_name2", default="seq2", help="Label for seq2")
     p_parse.add_argument("-off1", "--offset1", type=int, help="Manual offset for seq1")
