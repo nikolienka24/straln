@@ -19,7 +19,7 @@ straln --help
 ```
 
 ## Usage Guide
-`straln` is built around three primary modules: **parse**, **overlap**, and **snap**.
+`straln` is built around three primary modules: **parse**, **overlap**, and **snap**, and one complementary: **swap**.
 
 ### 1. Parse alignment (`parse`)
 Convert **EMBOSS markx0** files into to standardized `BEDPE` and `BED` formats.
@@ -46,7 +46,7 @@ straln parse my_alignment.aln -o ./results
 | **`seq1.bed` / `seq2.bed`** | `BED` | **Independent Tracks.** Standard BED files representing discrepancies in each individual sequence from the alignment. |
 | **`stats.txt`** | `Text` | **Metrics.** Summary of alignment length, identity percentage, mismatches, and gaps. |
 
->Note: Coordinates in `BEDPE`/`BED` files are 0-based and half-open like in a standard formats.
+>Note: Coordinates in `BEDPE`/`BED` files are 0-based and half-open like in the standard formats.
 
 ### Example: Automatic Merging (`.joined` files)
 
@@ -71,8 +71,38 @@ The `straln` toolkit automatically identifies fragmented alignment blocks collap
 
 ---
 
-### 2. Find alternative mutations (`overlap`)
-Compares mutations from your alignment/parsed alignment in `BEDPE` against a VCF file within a user-defined distance to report all variant matches.
+### 2. Swap alignment columns (`swap`)
+The `swap` module flips the roles of the two sequences in a `BEDPE` file. It exchanges all coordinates and sequences for **seq1** (columns 1-3, 7) with those of **seq2** (columns 4-6, 8). This is particularly useful when you need to change the reference orientation of your alignment results, e.g. using `straln overlap`.
+
+#### Arguments
+| Parameter | Short | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `input_file` | | Path to the `input.bedpe` file to be swapped. | **Required** |
+| `--output` | `-o` | Path to the output swapped BEDPE file. | `swapped.bedpe` |
+
+#### Command 
+```bash
+straln swap -o parsed.swapped.bedpe parsed.bedpe
+```
+
+#### Example Transformation
+
+**Before Swap (`parsed.bedpe`)**
+| chrom1 | start1 | end1 | chrom2 | start2 | end2 | seq1 | seq2 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| seq1 | 3 | 4 | seq2 | 1 | 2 | **AA** | **A** |
+| seq1 | 31 | 41 | seq2 | 11 | 12 | **AA** | **A** |
+
+**After Swap (`parsed.swapped.bedpe`)**
+| chrom1 | start1 | end1 | chrom2 | start2 | end2 | seq1 | seq2 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **seq2** | **1** | **2** | **seq1** | **2** | **4** | **A** | **AA** |
+| **seq2** | **11** | **12** | **seq1** | **31** | **41** | **A** | **AA** |
+
+---
+
+### 3. Find alternative mutations (`overlap`)
+* `overlap`: Compares mutations from your alignment/parsed alignment in `BEDPE` against a VCF file within a user-defined distance to report all variant matches.
 
 #### Parameters
 | Parameter | Short | Description | Required |
@@ -100,7 +130,7 @@ straln overlap --aln input.aln -v variations.vcf -c 17 -d 150
 
 ----
 
-### 3. Visual verification (`snap`)
+### 4. Visual verification (`snap`)
 The `snap` module creates an IGV batch script based on a JSON configuration file. This allows you to generate high-resolution screenshots of all provided discrepancies automatically.
 
 #### Arguments

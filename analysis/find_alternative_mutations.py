@@ -46,7 +46,7 @@ def is_99_percent_match(vcf_ref: str, vcf_alt: str, aln_seq1: str, aln_seq2: str
     alt_sim = ratio(vcf_alt, aln_seq2)
 
     # Both alleles must meet the 99% threshold
-    return ref_sim >= 0.98 and alt_sim >= 0.98
+    return ref_sim >= 0.99 and alt_sim >= 0.99
 
 
 def find(vcf_input: str, parsed_bedpe: str, output_folder: str,
