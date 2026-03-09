@@ -7,7 +7,7 @@ import pandas as pd
 
 from . import parser, reformat
 from .utils import save_statistics, get_offsets_from_file
-from analysis import find_alternative_mutations, create_igv_batch
+from analysis import find_alternative_mutations, create_igv_batch, swap_bedpe_columns
 
 
 def handle_parse(args):
@@ -115,6 +115,22 @@ def handle_snap(args):
     print(f"[*] How to run: check the documentation")
 
 
+def handle_swap(args):
+    """Logic for the 'swap' command"""
+    output_path = args.output_file
+    output_dir = os.path.dirname(output_path)
+    
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+
+    print(f"[*] Swapping columns in: {args.input_file}")
+    
+    swap_bedpe_columns.swap(args.input_file, output_path)
+    
+    print(f"[✔] Swap complete. Result saved to: {output_path}")
+
+
+
 def main():
     parser_main = argparse.ArgumentParser(
         description="straln: Stretcher Alignment Toolkit",
@@ -142,13 +158,19 @@ def main():
     p_overlap.add_argument("-v", "--vcf", required=True, help="Input VCF file")
     p_overlap.add_argument("-c", "--chrom", required=True, help="Chromosome")
     p_overlap.add_argument("-d", "--distance", type=int, default=100, help="Window size (bp)")
-    p_overlap.add_argument("-o", "--output_folder", default="straln_overlap_result", help="Output directory")
+    p_overlap.add_argument("-o", "--output_folder", default="straln_overlap_result", help="Path to output directory")
     p_overlap.set_defaults(func=handle_overlap)
 
     # ----- COMMAND: snap -----
     p_snap = subparsers.add_parser("snap", help="Generate IGV snapshots")
     p_snap.add_argument("config", help="Path to setup.json")
     p_snap.set_defaults(func=handle_snap)
+
+    # ----- COMMAND: swap -----
+    p_swap = subparsers.add_parser("swap", help="Swap alignment files.")
+    p_swap.add_argument("input_file", help="Path to input BEDPE")
+    p_swap.add_argument("-o", "--output_file", default="./seapped.bedpe", help="Path to output file")
+    p_swap.set_defaults(func=handle_swap)
 
     args = parser_main.parse_args()
 
