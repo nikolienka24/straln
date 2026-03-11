@@ -71,7 +71,7 @@ def handle_overlap(args):
 
     print(f"[*] Running overlap analysis with: {bedpe}")
     find_alternative_mutations.find(
-        args.vcf, bedpe, output_folder, args.chrom, args.distance
+        args.vcf, bedpe, output_folder, args.chrom, args.distance, args.percentual_identity
     )
 
     if args.aln:
@@ -159,6 +159,7 @@ def main():
     p_overlap.add_argument("-c", "--chrom", required=True, help="Chromosome")
     p_overlap.add_argument("-d", "--distance", type=int, default=100, help="Window size (bp)")
     p_overlap.add_argument("-o", "--output_folder", default="straln_overlap_result", help="Path to output directory")
+    p_overlap.add_argument("-p", "--percentual_identity", type=float, default=99, help="Percentual identity of alternative mutations to the mutation in vcf (float)")
     p_overlap.set_defaults(func=handle_overlap)
 
     # ----- COMMAND: snap -----

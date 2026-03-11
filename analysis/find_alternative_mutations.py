@@ -31,7 +31,7 @@ def filter_vcf_by_chromosome(vcf_path: str, chromosome: str) -> List[str]:
     return filtered_records
 
 
-def is_99_percent_match(vcf_ref: str, vcf_alt: str, aln_seq1: str, aln_seq2: str) -> bool:
+def is_x_percent_match(vcf_ref: str, vcf_alt: str, aln_seq1: str, aln_seq2: str, percent: int) -> bool:
     """
     Checks if the VCF mutation matches the alignment sequences using Levenshtein ratio.
     This handles shifts and small length differences better than SequenceMatcher.
@@ -46,11 +46,11 @@ def is_99_percent_match(vcf_ref: str, vcf_alt: str, aln_seq1: str, aln_seq2: str
     alt_sim = ratio(vcf_alt, aln_seq2)
 
     # Both alleles must meet the 99% threshold
-    return ref_sim >= 0.99 and alt_sim >= 0.99
+    return ref_sim >= (percent / 100) and alt_sim >= (percent / 100)
 
 
 def find(vcf_input: str, parsed_bedpe: str, output_folder: str,
-        chromosome: str, threshold: Optional[int] = None) -> None:
+        chromosome: str, threshold: Optional[int] = None, percent: float = 99) -> None:
     """
         Uses filter_vcf_by_chromosome to get relevant records, then maps them
         to the alignment to find nearby mutations, saving each to its own file.
@@ -105,9 +105,10 @@ def find(vcf_input: str, parsed_bedpe: str, output_folder: str,
             # 6. Apply the 99% Similarity Filter
             # We filter the 'nearby' mutations to only those that match the VCF alleles
             match_mask = candidates.apply(
-                lambda row: is_99_percent_match(
+                lambda row: is_x_percent_match(
                     vcf_ref, vcf_alt,
-                    row['seq1'], row['seq2']
+                    row['sequence1'], row['sequence2'],
+                    percent
                 ), axis=1
             )
 
@@ -127,5 +128,5 @@ def find(vcf_input: str, parsed_bedpe: str, output_folder: str,
                 output_df.to_csv(file_path, sep='\t', index=False)
                 found_count += 1
 
-    print(f"Found {len(vcf_lines)} records on chromosome {chromosome}.")
+    print(f"Found {len(vcf_lines)} records on chromosome {chromosome} in {vcf_input}.")
     print(f"Created {found_count} individual mutation files in: {alt_mut_dir}")

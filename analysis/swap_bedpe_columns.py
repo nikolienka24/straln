@@ -1,10 +1,10 @@
 import pandas as pd
 
 def swap(input_file, output_file):
-    cols = ['chrom1', 'start1', 'end1', 'chrom2', 'start2', 'end2', 'seq1', 'seq2']
+    cols = ['chrom1', 'start1', 'end1', 'chrom2', 'start2', 'end2', 'sequence1', 'sequence2']
     df = pd.read_csv(input_file, sep='\t', names=cols, header=0)
 
-    new_order = ['chrom2', 'start2', 'end2', 'chrom1', 'start1', 'end1', 'seq2', 'seq1']
+    new_order = ['chrom2', 'start2', 'end2', 'chrom1', 'start1', 'end1', 'sequence2', 'sequence1']
     df_swapped = df[new_order]
     
     df_swapped.columns = cols
