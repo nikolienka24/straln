@@ -56,28 +56,24 @@ def _flush_buffer(buf: List[List[str]], out_fh: TextIO) -> None:
     out_fh.write(f"{chrom1}\t{start1}\t{end1}\t{chrom2}\t{start2}\t{end2}\t{seq1}\t{seq2}\n")
 
 
-def _is_consecutive(prev: List[str], curr: List[str]) -> bool:
+def _is_consecutive(prev: List, curr: List) -> bool:
     """
-    Determine if two BEDPE rows are consecutive:
-    - consecutive in both sequences, or in ref-only or alt-only
+    Riadky nadväzujú, ak sa ich súradnice prekrývajú o 1 (anchor)
+    alebo na seba plynule nadväzujú (0-based).
     """
+    # Rozdiel medzi štartom aktuálneho a koncom predchádzajúceho
+    # Pri indeli s kotvou bude tento rozdiel -1 (prekryv)
+    # Pri SNP bez kotvy bude tento rozdiel 0
+    diff1 = curr[1] - prev[2]
+    diff2 = curr[4] - prev[5]
 
-    prev1_start, prev1_end = prev[1], prev[2]
-    prev2_start, prev2_end = prev[4], prev[5]
-    curr1_start, curr1_end = curr[1], curr[2]
-    curr2_start, curr2_end = curr[4], curr[5]
+    # Povolený rozsah je -1 (prekryv o 1 bázu) až 0 (plynulé nadviazanie)
+    # Zároveň kontrolujeme, či aspoň jedna sekvencia ostáva na mieste (Indel)
+    # alebo obe pokračujú (SNP)
+    conn1 = -1 <= diff1 <= 0
+    conn2 = -1 <= diff2 <= 0
 
-    # Both sequences advance
-    if int(prev1_end) == int(curr1_start) and int(prev2_end) + 1 == int(curr2_start) + 1:
-        return True
-    # Ref only
-    elif int(prev1_end) == int(curr1_start):
-        return True
-    # Alt only
-    elif int(prev2_end) == int(curr2_start):
-        return True
-
-    return False
+    return conn1 and conn2
 
 
 def join_consecutive_rows(input_file: str, output_file: str) -> None:
