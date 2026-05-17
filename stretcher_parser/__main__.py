@@ -130,7 +130,6 @@ def handle_swap(args):
     print(f"[✔] Swap complete. Result saved to: {output_path}")
 
 
-
 def main():
     parser_main = argparse.ArgumentParser(
         description="straln: Stretcher Alignment Toolkit",
