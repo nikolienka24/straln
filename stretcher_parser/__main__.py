@@ -12,7 +12,7 @@ from analysis import find_alternative_mutations, create_igv_batch, swap_bedpe_co
 
 def handle_parse(args):
     """Logic for the 'parse' command"""
-    output_folder = args.output_folder or "./straln_parse_results"
+    output_folder = args.output_folder
     os.makedirs(output_folder, exist_ok=True)
 
     # Handle offsets
@@ -76,6 +76,7 @@ def handle_overlap(args):
 
     if args.aln:
         os.remove(parsed_file)
+        os.remove(parsed_joined_file)
     
     print(f"[✔] Overlap analysis complete. Results in: {output_folder}")
 
@@ -83,8 +84,8 @@ def handle_overlap(args):
 def handle_snap(args):
     """Logic for the 'snap' command: Generates IGV batch script from JSON"""
     print(f"[*] Reading configuration from {args.config}...")
-    
-        # Use the first argument as the JSON config path
+
+    # Use the first argument as the JSON config path
     config_file = args.config
 
     # Load configuration from JSON

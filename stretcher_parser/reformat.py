@@ -58,18 +58,18 @@ def _flush_buffer(buf: List[List[str]], out_fh: TextIO) -> None:
 
 def _is_consecutive(prev: List, curr: List) -> bool:
     """
-    Riadky nadväzujú, ak sa ich súradnice prekrývajú o 1 (anchor)
-    alebo na seba plynule nadväzujú (0-based).
+    Two rows are consecutive if their coordinates overlap by 1 (anchor)
+    or follow each other directly (0-based).
     """
-    # Rozdiel medzi štartom aktuálneho a koncom predchádzajúceho
-    # Pri indeli s kotvou bude tento rozdiel -1 (prekryv)
-    # Pri SNP bez kotvy bude tento rozdiel 0
+    # Difference between the start of the current row and the end of the previous one
+    # For an indel with anchor the difference is -1 (overlap)
+    # For a SNP without anchor the difference is 0
     diff1 = curr[1] - prev[2]
     diff2 = curr[4] - prev[5]
 
-    # Povolený rozsah je -1 (prekryv o 1 bázu) až 0 (plynulé nadviazanie)
-    # Zároveň kontrolujeme, či aspoň jedna sekvencia ostáva na mieste (Indel)
-    # alebo obe pokračujú (SNP)
+    # Allowed range is -1 (overlap by 1 base) to 0 (seamless continuation)
+    # We also check that at least one sequence stays in place (indel)
+    # or both advance (SNP)
     conn1 = -1 <= diff1 <= 0
     conn2 = -1 <= diff2 <= 0
 

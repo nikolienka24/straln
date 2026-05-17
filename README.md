@@ -31,8 +31,8 @@ Convert **EMBOSS markx0** files into to standardized `BEDPE` and `BED` formats.
 | `--output` | `-o` | Directory to save the parsed files. | `./straln_parse_results` |
 | `--seq1_name` | `-s1` | Label for seq1. | `seq1` |
 | `--seq2_name` | `-s2` | Label for seq2. | `seq2` |
-| `--offset1` | `-off1` | Manual offset for seq1. | Extracted from the input alignment file header. |
-| `--offset2` | `-off2` | Manual offset for seq2. | Extracted from the input alignment file header. |
+| `--offset1` | `-off1` | Manual 0-based offset for seq1. | Extracted from the input alignment file header. |
+| `--offset2` | `-off2` | Manual 0-based offset for seq2. | Extracted from the input alignment file header. |
 
 #### Command 
 ```bash

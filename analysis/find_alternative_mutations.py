@@ -1,7 +1,6 @@
-from typing import List, Optional, Union
-import vcf, re, os, tempfile, math
+from typing import List, Optional
+import re, os
 import pandas as pd
-from difflib import SequenceMatcher
 from Levenshtein import ratio
 
 
@@ -93,9 +92,9 @@ def find(vcf_input: str, parsed_bedpe: str, output_folder: str,
         # We compare VCF position (Seq1) to alignment position (start1)
         distances = (df_diffs['start1'] - vcf_start).abs()
         if threshold:
-            mask_dist = (distances > 0) & (distances <= threshold)
+            mask_dist = distances <= threshold
         else:
-            mask_dist = distances > 0
+            mask_dist = distances >= 0
 
         if mask_dist.any():
             # Get candidates within distance

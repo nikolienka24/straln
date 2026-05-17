@@ -15,7 +15,7 @@ def save_statistics(seq_name1: str, seq_name2: str,
         f.write(f"  Base mismatches (including gaps): {mismatches}\n")
         f.write(f"  Gaps detected: {gaps}\n")
         if length > 0:
-            mismatch_rate = (mismatches + gaps) / length * 100
+            mismatch_rate = mismatches / length * 100
             gap_rate = gaps / length * 100
             f.write(f"  Mismatch rate (including gaps): {mismatch_rate:.8f}%\n")
             f.write(f"  Gap rate: {gap_rate:.8f}%\n")

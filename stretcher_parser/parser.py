@@ -1,11 +1,11 @@
-from typing import Tuple, List, Optional, Union
-from stretcher_parser.utils import get_offsets_from_file
+from typing import Tuple, List
 
 
 def _check_sequences(sequence_name1, sequence_name2,
                      seq1_data, seq2_data,
                      found_start, buffer,
-                     prefix_a, prefix_b):
+                     prefix_a, prefix_b,
+                     buf_mm, buf_gaps):
     output = ""
     p1, p2 = seq1_data[1], seq2_data[1]
     seq1_chunk, seq2_chunk = seq1_data[0], seq2_data[0]
@@ -14,15 +14,15 @@ def _check_sequences(sequence_name1, sequence_name2,
     line_mismatches, line_gaps = 0, 0
 
     for a, b in zip(seq1_chunk, seq2_chunk):
-        # 1. Pozície PRED spracovaním písmena
+        # 1. Save positions BEFORE processing the character
         current_p1_start = p1
         current_p2_start = p2
 
-        # 2. Posun počítadla (ak nie je gap)
+        # 2. Advance counters (only for non-gap characters)
         if a != "-": p1 += 1
         if b != "-": p2 += 1
 
-        # 3. Hľadanie začiatku reálneho alignmentu
+        # 3. Skip leading gaps before the first real aligned pair
         if not found_start:
             if a != "-" and b != "-":
                 found_start = True
@@ -31,7 +31,7 @@ def _check_sequences(sequence_name1, sequence_name2,
 
         line_len_curr += 1
 
-        # 4. Ak nájdeme nesúlad (SNP alebo Indel)
+        # 4. Handle mismatches (SNP or Indel)
         if a != b:
             if a == "-" or b == "-":
                 # INDEL
@@ -46,23 +46,27 @@ def _check_sequences(sequence_name1, sequence_name2,
                 out1, out2 = a, b
 
             buffer.append(f"{sequence_name1}\t{s1}\t{e1}\t{sequence_name2}\t{s2}\t{e2}\t{out1}\t{out2}\n")
-            line_mismatches += 1
-            if a == "-" or b == "-": line_gaps += 1
+            # Track pending counts — only committed to stats when buffer is flushed on a match
+            buf_mm += 1
+            if a == "-" or b == "-": buf_gaps += 1
 
-        # 5. DÔLEŽITÉ: Pri zhode (A==A) vyprázdnime buffer do outputu
+        # 5. On match (A==A): flush buffer to output and commit pending stats
         if a == b and a != "-":
             if buffer:
                 output += "".join(buffer)
                 buffer.clear()
+                line_mismatches += buf_mm
+                line_gaps += buf_gaps
+                buf_mm, buf_gaps = 0, 0
 
             line_len += line_len_curr
             line_len_curr = 0
 
-        # Aktualizácia kotvy pre Indely
+        # Update prefix (last non-gap character seen in each sequence)
         if a != "-": prefix_a = a
         if b != "-": prefix_b = b
 
-    return output, line_len, line_mismatches, line_gaps, found_start, buffer, p1, p2, prefix_a, prefix_b
+    return output, line_len, line_mismatches, line_gaps, found_start, buffer, p1, p2, prefix_a, prefix_b, buf_mm, buf_gaps
 
 def _parse(input_file: str, output_file: str,
            seq_name1: str, seq_name2:str,
@@ -94,6 +98,7 @@ def _parse(input_file: str, output_file: str,
 
         curr1, curr2 = offset_seq1, offset_seq2
         prefix_a, prefix_b = None, None
+        buf_mm, buf_gaps = 0, 0
         while True:
             if line.startswith("#") or not line:
                 break
@@ -113,12 +118,13 @@ def _parse(input_file: str, output_file: str,
             if not seq2_seq:
                 break
 
-            out, line_length, mm_add, gaps_add, found_start, buffer, curr1, curr2, prefix_a, prefix_b = _check_sequences(
+            out, line_length, mm_add, gaps_add, found_start, buffer, curr1, curr2, prefix_a, prefix_b, buf_mm, buf_gaps = _check_sequences(
                 seq_name1, seq_name2,
                 [seq1_seq, curr1],
                 [seq2_seq, curr2],
                 found_start, buffer,
-                prefix_a, prefix_b
+                prefix_a, prefix_b,
+                buf_mm, buf_gaps
             )
             outfile.write(out)
 
