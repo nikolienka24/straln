@@ -11,4 +11,4 @@ def swap(input_file, output_file):
     
     df_swapped.to_csv(output_file, sep='\t', index=False, header=True)
     
-    print(f"Hotovo! Dáta boli prehodené a uložené do {output_file}")
+    print(f"Done! Data swapped and saved to {output_file}")
